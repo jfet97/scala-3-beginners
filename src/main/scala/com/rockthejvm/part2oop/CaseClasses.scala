@@ -40,7 +40,9 @@ object CaseClasses {
 
   case class CCWithArgListNoArgs() // legal, without so much sense
   // useful for generics, i.e. the Empty list
-  val singletonInstance = CCWithArgListNoArgs
+  val singletonInstance = CCWithArgListNoArgs()
+
+  // abstract classes cannot be case classes
 
   def main(args: Array[String]): Unit = {
     println(andrea)

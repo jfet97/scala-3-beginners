@@ -8,7 +8,7 @@ abstract class LList[A] {
   def tail: LList[A]
   def isEmpty: Boolean
   // add at the front of the list
-  def add(element: A): LList[A] = new Cons(element, this) // immutability
+  def add(element: A): LList[A] = Cons(element, this) // immutability
 
   def map[B](transformer: A => B): LList[B]
   def filter(predicate: A => Boolean): LList[A]
@@ -20,14 +20,14 @@ abstract class LList[A] {
   def reverse: LList[A]
 }
 
-class Empty[A] extends LList[A] {
+case class Empty[A]() extends LList[A] {
   override def head: A = throw new NoSuchElementException
   override def tail: LList[A] = throw new NoSuchElementException
   override def isEmpty: Boolean = true
 
-  override def map[B](transformer: A => B): LList[B] = new Empty[B]
+  override def map[B](transformer: A => B): LList[B] = Empty()
   override def filter(predicate: A => Boolean): LList[A] = this
-  override def flatMap[B](transformer: A => LList[B]): LList[B] = new Empty[B]
+  override def flatMap[B](transformer: A => LList[B]): LList[B] = Empty()
 
   override def concat(anotherList: LList[A]) = anotherList
 
@@ -37,7 +37,7 @@ class Empty[A] extends LList[A] {
 }
 
 // we have overriden the accessor method tail with a value
-class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
+case class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
   override def head: A = value
   override def isEmpty: Boolean = false
 
@@ -56,9 +56,9 @@ class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
     @tailrec
     def inner(remainder: LList[A], acc: LList[B]): LList[B] =
       if (remainder.isEmpty) acc
-      else inner(remainder.tail, new Cons[B](transformer(remainder.head), acc))
+      else inner(remainder.tail, Cons[B](transformer(remainder.head), acc))
 
-    inner(this, new Empty[B]).reverse
+    inner(this, Empty()).reverse
   }
 
   // filter
@@ -67,9 +67,9 @@ class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
     def inner(remainder: LList[A], acc: LList[A]): LList[A] =
       if (remainder.isEmpty) acc
       else if (predicate(remainder.head) == false) inner(remainder.tail, acc)
-      else inner(remainder.tail, new Cons[A](remainder.head, acc))
+      else inner(remainder.tail, Cons[A](remainder.head, acc))
 
-    inner(this, new Empty[A]).reverse
+    inner(this, Empty()).reverse
   }
 
   // flatmap
@@ -79,7 +79,7 @@ class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
       if (remainder.isEmpty) acc
       else inner(remainder.tail, transformer(remainder.head).reverse.concat(acc))
 
-    inner(this, new Empty[B]).reverse
+    inner(this, Empty()).reverse
   }
 
   // concat
@@ -87,7 +87,7 @@ class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
     @tailrec
     def inner(remainder: LList[A], acc: LList[A]): LList[A] =
       if(remainder.isEmpty) acc
-      else inner(remainder.tail, new Cons[A](remainder.head, acc))
+      else inner(remainder.tail, Cons[A](remainder.head, acc))
 
     inner(this.reverse, anotherList)
   }
@@ -97,9 +97,9 @@ class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
     @tailrec
     def inner(remainder: LList[A], acc: LList[A]): LList[A] =
       if(remainder.isEmpty) acc
-      else inner(remainder.tail, new Cons(remainder.head, acc))
+      else inner(remainder.tail, Cons(remainder.head, acc))
 
-    inner(this, new Empty)
+    inner(this, Empty())
   }
 }
 
@@ -114,7 +114,7 @@ object LListTest {
     // val empty_v2: Empty[Int] = new Empty[Nothing] X
     // val empty_v3: Empty[Nothing] = new Empty[Int] X
 
-    val first4Numbers = Cons(1, Cons(2, Cons(3,   Cons(4,  new Empty)))) // A inferred as Int, used for the Empty type parameter as well
+    val first4Numbers = Cons(1, Cons(2, Cons(3, Cons(4, Empty())))) // A inferred as Int, used for the Empty type parameter as well
     println(first4Numbers) // [1, 2, 3, 4]
 
     val first4Numbers_v2 = empty.add(1).add(2).add(3).add(4) // [4, 3, 2, 1]
