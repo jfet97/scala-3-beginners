@@ -175,5 +175,13 @@ object LListTest {
     val flattenedList = first4Numbers.flatMap(doublerList)
     val flattenedList_v2 = first4Numbers.flatMap(value => Cons(value, Cons(value + 1, Empty())))
     println(flattenedList)
+
+    // find test
+    println(LList.find[Int](first4Numbers, _ % 2 == 0)) // 2
+    println(try {
+      LList.find[Int](first4Numbers, _ % 7 == 0)
+    } catch {
+      case e: NoSuchElementException => "No such element"
+    })
   }
 }
