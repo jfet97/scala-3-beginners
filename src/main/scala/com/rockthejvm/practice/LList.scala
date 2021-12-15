@@ -29,9 +29,9 @@ class Empty[A] extends LList[A] {
   override def filter(predicate: A => Boolean): LList[A] = this
   override def flatMap[B](transformer: A => LList[B]): LList[B] = new Empty[B]
 
-  def concat(anotherList: LList[A]) = anotherList
+  override def concat(anotherList: LList[A]) = anotherList
 
-  def reverse = this
+  override def reverse = this
 
   override def toString: String = "[]"
 }
@@ -83,7 +83,7 @@ class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
   }
 
   // concat
-  def concat(anotherList: LList[A]): LList[A] = {
+  override def concat(anotherList: LList[A]): LList[A] = {
     @tailrec
     def inner(remainder: LList[A], acc: LList[A]): LList[A] =
       if(remainder.isEmpty) acc
@@ -145,7 +145,7 @@ object LListTest {
     // map testing
     val numbersDoubled = first4Numbers.map(doubler)
     val numbersDoubled_v2 = first4Numbers.map(x => x * 2)
-    val numbersDoubled_v3 = first4Numbers.map(_ * 2)
+    val numbersDoubled_v3 = first4Numbers.map(_ * 2) // _ is the implicit parameter
     println(numbersDoubled)
 
     val numbersNested = first4Numbers.map(doublerList)
