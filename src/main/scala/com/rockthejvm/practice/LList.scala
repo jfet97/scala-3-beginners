@@ -20,6 +20,15 @@ abstract class LList[A] {
   def reverse: LList[A]
 }
 
+object LList {
+  @tailrec
+  def find[A](list: LList[A], predicate: A => Boolean): A = {
+    if (list.isEmpty) throw new NoSuchElementException
+    else if (predicate(list.head)) list.head
+    else find(list.tail, predicate)
+  }
+}
+
 case class Empty[A]() extends LList[A] {
   override def head: A = throw new NoSuchElementException
   override def tail: LList[A] = throw new NoSuchElementException
