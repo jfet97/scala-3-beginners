@@ -29,11 +29,11 @@ object AnonymousFunctions {
 
 
   // type inference
-  val doubler_v3: Int => Int = x => x * 2 // type inferred by compiler
+  val doubler_v4: Int => Int = x => x * 2 // type inferred by compiler
   val adder: (Int, Int) => Int = (x, y) => x + y
 
   // shortest lambdas
-  val doubler_v4: Int => Int = _ * 2 // x => x * 2
+  val doubler_v5: Int => Int = _ * 2 // x => x * 2
   val adder_v2: (Int, Int) => Int = _ + _ // (x, y) => x + y
   // each underscore is a different argument, you can't reuse them
 
