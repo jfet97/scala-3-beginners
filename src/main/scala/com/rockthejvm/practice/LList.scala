@@ -12,6 +12,7 @@ abstract class LList[A] {
 
   def map[B](transformer: A => B): LList[B]
   def filter(predicate: A => Boolean): LList[A]
+  def withFilter(predicate: A => Boolean): LList[A] = filter(predicate)
   def flatMap[B](transformer: A => LList[B]): LList[B]
 
   def concat(anotherList: LList[A]): LList[A]
