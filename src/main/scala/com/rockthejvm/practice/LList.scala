@@ -18,6 +18,14 @@ abstract class LList[A] {
   infix def ++(anotherList: LList[A]): LList[A] = concat(anotherList) // this.concat(anotherList)
 
   def reverse: LList[A]
+
+  def foreach(action: A => Unit): Unit
+  def sort(comparator: (A, A) => Int): LList[A]
+  def zipWith[B, T](list: LList[T], zip: (A, T) => B): LList[B]
+  def foldLeft[B](start: B)(operator: (B, A) => B): B
+
+  def copy: LList[A]
+  def length: Int
 }
 
 object LList {
@@ -41,6 +49,17 @@ case class Empty[A]() extends LList[A] {
   override def concat(anotherList: LList[A]) = anotherList
 
   override def reverse = this
+
+  override def foreach(action: A => Unit): Unit = ()
+  override def sort(comparator: (A, A) => Int): LList[A] = this
+  override def zipWith[B, T](list: LList[T], zip: (A, T) => B) =
+    if (!list.isEmpty) throw new IllegalArgumentException("Zipping lists of non equal length")
+    else Empty()
+  override def foldLeft[B](start: B)(operator: (B, A) => B): B = start
+
+  override def copy: LList[A] = this
+
+  override def length: Int = 0
 
   override def toString: String = "[]"
 }
@@ -110,6 +129,78 @@ case class Cons[A](value: A, override val tail: LList[A]) extends LList[A] {
 
     inner(this, Empty())
   }
+
+  // foreach
+  override def foreach(action: A => Unit): Unit = {
+    @tailrec
+    def inner(remainder: LList[A]): Unit =
+      if(remainder.isEmpty) ()
+      else {
+        action(remainder.head)
+        inner(remainder.tail)
+      }
+
+    inner(this)
+  }
+
+  // sort
+  override def sort(comparator: (A, A) => Int): LList[A] = {
+    @tailrec
+    def move(el: A, remainder: LList[A], acc: LList[A] = Empty()): LList[A] =
+      if(remainder.isEmpty) Cons(el, acc).reverse
+      else if(comparator(el, remainder.head) <= 0) acc.reverse.concat(Cons(el, remainder))
+      else move(el, remainder.tail, Cons(remainder.head, acc))
+
+    @tailrec
+    def inner(remainder: LList[A], acc: LList[A] => LList[A] = identity): LList[A] =
+      if(remainder.isEmpty) acc(Empty())
+      else inner(remainder.tail, orderedTail => acc(move(remainder.head, orderedTail)))
+
+    inner(this)
+  }
+
+  override def zipWith[B, T](list: LList[T], zip: (A, T) => B): LList[B] = {
+    if (this.length != list.length) throw new IllegalArgumentException("Zipping lists of non equal length")
+
+    @tailrec
+    def inner(thisRemainder: LList[A], listRemainder: LList[T], acc: LList[B] = Empty()): LList[B] =
+      if (thisRemainder.isEmpty) acc
+      else inner(thisRemainder.tail, listRemainder.tail, Cons(zip(thisRemainder.head, listRemainder.head), acc))
+
+    inner(this, list).reverse
+  }
+
+  // foldLeft
+  override def foldLeft[B](start: B)(operator: (B, A) => B): B = {
+    @tailrec
+    def inner(remainder: LList[A], acc: B): B =
+      if(remainder.isEmpty) acc
+      else inner(remainder.tail, operator(acc, remainder.head))
+
+    inner(this, start)
+  }
+
+  // copy
+  override def copy: LList[A] = {
+    @tailrec
+    def inner(remainder: LList[A], acc: LList[A]): LList[A] =
+      if(remainder.isEmpty) acc
+      else inner(remainder.tail, Cons(remainder.head, acc))
+
+    inner(this, Empty()).reverse
+  }
+
+  // length
+  override def length: Int = {
+    @tailrec
+    def inner(remainder: LList[A], acc: Int = 0): Int =
+      if(remainder.isEmpty) acc
+      else inner(remainder.tail, acc + 1)
+
+    inner(this)
+  }
+
+
 }
 
 object LListTest {
@@ -130,7 +221,7 @@ object LListTest {
     println(first4Numbers_v2)
     println(first4Numbers_v2.isEmpty)
 
-    val someStrings = Cons("dog", Cons("cat", Cons("crocodile", Empty())))
+    val someStrings = Cons("bird", Cons("dog", Cons("cat", Cons("crocodile", Empty()))))
     println(someStrings)
 
     println("")
@@ -183,5 +274,14 @@ object LListTest {
     } catch {
       case e: NoSuchElementException => "No such element"
     })
+
+    // HOFs exercises testing
+    first4Numbers.foreach(println)
+    println(first4Numbers.sort((n, m) => if (n > m) 1 else -1))
+    println(first4Numbers.sort((n, m) => if (n < m) 1 else -1))
+    println(first4Numbers.foldLeft(0)(_ + _))
+
+    val zippedList = first4Numbers.zipWith[String, String](someStrings, (number, string) => s"$number-$string")
+    println(zippedList)
   }
 }

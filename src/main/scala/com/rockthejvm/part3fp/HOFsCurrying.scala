@@ -56,6 +56,21 @@ object HOFsCurrying {
   val standardFormat: (Double => String) = curriedFormatter("%4.2f") // (x: Double) => "%4.2f".format(x)
   val preciseFormat: (Double => String) = curriedFormatter("%10.8f") // (x: Double) => "%10.8f".format(x)
 
+  /**
+   * Exercises
+   * 
+   * 1. LList
+   *    - foreach(A => Unit): Unit
+   *    
+   *    - sort((A, A) => Int): LList[A]
+   *      (hint: insertion sort)
+   *      
+   *    - zipWith[B](LList[A], (A,A) => B): LList[B]
+   *      (exception if not same length)
+   *      
+   *    - foldLeft[B](start: B)((A, B) => B): B
+   */
+
   def main(args: Array[String]): Unit = {
     println(tenThousand)
     println(oneHundred)

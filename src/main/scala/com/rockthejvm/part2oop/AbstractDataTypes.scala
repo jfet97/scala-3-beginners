@@ -11,6 +11,15 @@ object AbstractDataTypes {
 
     // it is an "accessor method" (no args, no parenthesis)
     def preferredMeal: String = "anything" // not abstract
+
+    /**
+     * When a method takes no parameters, it’s said to have an arity level of arity-0. Similarly,
+     * when a method takes one parameter it’s an arity-1 method. When you create arity-0 methods:
+     * 
+     * If the method performs side effects, such as calling println, declare the method with empty parentheses
+     * If the method does not perform side effects—such as getting the size of a collection,
+     * which is similar to accessing a field on the collection—leave the parentheses off
+     */
   }
 
   // val animal = new Animal X
