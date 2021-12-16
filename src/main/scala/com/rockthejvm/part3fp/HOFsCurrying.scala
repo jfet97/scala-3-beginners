@@ -69,12 +69,37 @@ object HOFsCurrying {
    *      (exception if not same length)
    *      
    *    - foldLeft[B](start: B)((A, B) => B): B
+   *
+   * 2. toCurry(f: (Int, Int) => Int): Int => Int => Int
+   *    fromCurry(f: Int => Int => Int): (Int, Int) => Int
+   *
+   * 3. compose(f, g) => x => f(g(x))
+   *    andThen(f, g) => x => g(f(x))
    */
+
+  def toCurry[A, B, C](f: (A, B) => C): A => B => C = n => m => f(n, m)
+
+  def fromCurry[A, B, C](f: A => B => C): (A, B) => C = (n, m) => f(n)(m)
+
+  def compose[A, B, C](f: B => C, g: A => B): A => C = x => f(g(x))
+
+  def andThen[A, B, C](f: A => B, g: B => C): A => C = x => g(f(x))
+
+  val superAdder_v2 = toCurry[Int, Int, Int](_ + _) // same as superAdder
+  val simpleAdder = fromCurry(superAdder)
+  val incrementer = (x: Int) => x + 1
+  val doubler = (x: Int) => 2 * x
+  val composedApplication = compose(incrementer, doubler)
+  val aSequencedApplication = andThen(incrementer, doubler)
 
   def main(args: Array[String]): Unit = {
     println(tenThousand)
     println(oneHundred)
     println(standardFormat(Math.PI))
     println(preciseFormat(Math.PI))
+
+    println(simpleAdder(2,78)) // 80
+    println(composedApplication(14)) // 29 = 2 * 14 + 1
+    println(aSequencedApplication(14)) // 30 = (14 + 1) *
   }
 }
