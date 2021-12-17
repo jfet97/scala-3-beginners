@@ -39,6 +39,7 @@ object MapFlatMapFilterFor {
   // without flatMap:
   // each char would be mapped into a List[String]
   // so each number would be mapped into a List[List[String]]
+  // so combinations will be a List[List[List[String]]]
 
   // for-comprehension = same as above
   val combinationsFor = for {
